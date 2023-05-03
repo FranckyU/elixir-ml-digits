@@ -3,6 +3,8 @@ defmodule Digits.Model do
   The Digits Machine Learning model
   """
 
+  require Axon
+
   def download do
     Scidata.MNIST.download()
   end
@@ -57,5 +59,24 @@ defmodule Digits.Model do
 
   def path do
     Path.join(Application.app_dir(:digits, "priv"), "model.axon")
+  end
+
+  def predict(path) do
+    mat = Evision.imread(path, flags: Evision.Constant.cv_IMREAD_GRAYSCALE())
+    mat = Evision.resize(mat, {28, 28})
+
+    data =
+      Evision.Mat.to_nx(mat)
+      |> Nx.reshape({1, 28, 28})
+      |> List.wrap()
+      |> Nx.stack()
+      |> Nx.backend_transfer()
+
+    {model, state} = load!()
+
+    model
+    |> Axon.predict(state, data)
+    |> Nx.argmax()
+    |> Nx.to_number()
   end
 end

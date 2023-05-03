@@ -22,8 +22,34 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
+// app specific imports
+import Draw from 'draw-on-canvas'
+
+let Hooks = {}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
+let liveSocket = new LiveSocket("/live", Socket, {
+  params: {_csrf_token: csrfToken},
+  hooks: Hooks
+})
+
+Hooks.Draw = {
+  mounted() {
+    this.draw = new Draw(this.el, 384, 384, {
+      backgroundColor: "black",
+      strokeColor: "white",
+      strokeWeight: 3
+    })
+
+    this.handleEvent("reset", () => {
+      this.draw.reset()
+    })
+
+    this.handleEvent("predict", () => {
+      this.pushEvent("image", this.draw.canvas.toDataURL())
+    })
+  }
+}
 
 // Show progress bar on live navigation and form submits
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})

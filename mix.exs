@@ -50,7 +50,8 @@ defmodule Digits.MixProject do
       {:axon, "~> 0.5.1"},
       {:exla, "~> 0.5.1"},
       {:nx, "~> 0.5.1"},
-      {:scidata, "~> 0.1.5"}
+      {:scidata, "~> 0.1.5"},
+      {:evision, "~> 0.1.31"}
     ]
   end
 
